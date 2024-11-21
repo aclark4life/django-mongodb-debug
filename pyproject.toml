@@ -1,0 +1,9 @@
+[project]
+name = "django-mongodb-debug"
+version = "0.1.0"
+dependencies = [
+    "django-debug-toolbar",
+]
+
+[tool.setuptools]
+packages = ["django_mongodb_debug"]
