@@ -206,7 +206,7 @@ class SQLQueryTriggered(Exception):
 
 class MongoPanel(Panel):
     """
-    Panel that displays information about the SQL queries run while processing
+    Panel that displays information about the MongoDB queries run while processing
     the request.
     """
 
