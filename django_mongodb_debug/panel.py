@@ -288,12 +288,12 @@ class MongoPanel(Panel):
     def title(self):
         count = len(self._databases)
         return ngettext(
-            "SQL queries from %(count)d connection",
-            "SQL queries from %(count)d connections",
+            "MongoDB queries from %(count)d connection",
+            "MongoDB queries from %(count)d connections",
             count,
         ) % {"count": count}
 
-    template = "debug_toolbar/panels/sql.html"
+    template = "mql.html"
 
     @classmethod
     def get_urls(cls):
@@ -413,6 +413,6 @@ class MongoPanel(Panel):
 
     def generate_server_timing(self, request, response):
         stats = self.get_stats()
-        title = "SQL {} queries".format(len(stats.get("queries", [])))
+        title = "MongoDB {} queries".format(len(stats.get("queries", [])))
         value = stats.get("sql_time", 0)
         self.record_server_timing("sql_time", title, value)
