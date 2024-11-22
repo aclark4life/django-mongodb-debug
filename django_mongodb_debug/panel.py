@@ -62,6 +62,9 @@ def _process_query_groups(query_groups, databases, colors, name):
 
 
 def wrap_cursor(connection):
+    # (Pdb) connection
+    # <DatabaseWrapper vendor='mongodb' alias='default'>
+
     # When running a SimpleTestCase, Django monkey patches some DatabaseWrapper
     # methods, including .cursor() and .chunked_cursor(), to raise an exception
     # if the test code tries to access the database, and then undoes the monkey
