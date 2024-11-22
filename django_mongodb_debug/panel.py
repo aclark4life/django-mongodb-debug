@@ -60,8 +60,6 @@ class MongoPanel(Panel):
         self._sql_time = 0
         self._queries = []
         self._databases = {}
-        # synthetic transaction IDs, keyed by DB alias
-        self._transaction_ids = {}
 
     def record(self, **kwargs):
         self._queries.append(kwargs)
@@ -168,8 +166,6 @@ class MongoPanel(Panel):
                 prev_query = last_by_alias.get(alias, {})
                 prev_trans_id = prev_query.get("trans_id")
 
-                # If two consecutive queries for a given DB alias have different
-                # transaction ID values, a transaction started, finished, or both, so
                 # annotate the queries as appropriate.
                 if trans_id != prev_trans_id:
                     if prev_trans_id is not None:
@@ -202,12 +198,6 @@ class MongoPanel(Panel):
                 query["trace_color"] = trace_colors[query["stacktrace"]]
 
                 last_by_alias[alias] = query
-
-            # Close out any transactions that were in progress, since there is no
-            # explicit way to know when a transaction finishes.
-            for final_query in last_by_alias.values():
-                if final_query.get("trans_id") is not None:
-                    final_query["ends_trans"] = True
 
         group_colors = contrasting_color_generator()
         _process_query_groups(
