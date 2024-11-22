@@ -174,10 +174,6 @@ class NormalCursorMixin(DjDTCursorWrapperMixin):
         alias = self.db.alias
         vendor = self.db.vendor
 
-        if vendor == "postgresql":
-            # The underlying DB connection (as opposed to Django's wrapper)
-            conn = self.db.connection
-
         start_time = perf_counter()
         try:
             return method(sql, params)
@@ -190,15 +186,7 @@ class NormalCursorMixin(DjDTCursorWrapperMixin):
                 _params = json.dumps(self._decode(params))
             template_info = get_template_info()
 
-            # Sql might be an object (such as psycopg Composed).
-            # For logging purposes, make sure it's str.
-            if vendor == "postgresql" and not isinstance(sql, str):
-                if isinstance(sql, bytes):
-                    sql = sql.decode("utf-8")
-                else:
-                    sql = sql.as_string(conn)
-            else:
-                sql = str(sql)
+            sql = str(sql)
 
             kwargs = {
                 "vendor": vendor,
@@ -211,21 +199,6 @@ class NormalCursorMixin(DjDTCursorWrapperMixin):
                 "stacktrace": get_stack_trace(skip=2),
                 "template_info": template_info,
             }
-
-            if vendor == "postgresql":
-                # If an erroneous query was ran on the connection, it might
-                # be in a state where checking isolation_level raises an
-                # exception.
-                try:
-                    iso_level = conn.isolation_level
-                except conn.InternalError:
-                    iso_level = "unknown"
-
-                kwargs.update(
-                    {
-                        "iso_level": iso_level,
-                    }
-                )
 
             # We keep `sql` to maintain backwards compatibility
             self.logger.record(**kwargs)
