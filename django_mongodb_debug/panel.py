@@ -157,19 +157,6 @@ class NormalCursorMixin(DjDTCursorWrapperMixin):
         except UnicodeDecodeError:
             return "(encoded string)"
 
-    def _last_executed_query(self, sql, params):
-        """Get the last executed query from the connection."""
-        # Django's psycopg3 backend creates a new cursor in its implementation of the
-        # .last_executed_query() method.  To avoid wrapping that cursor, temporarily set
-        # the DatabaseWrapper's ._djdt_logger attribute to None.  This will cause the
-        # monkey-patched .cursor() and .chunked_cursor() methods to skip the wrapping
-        # process during the .last_executed_query() call.
-        self.db._djdt_logger = None
-        try:
-            return self.db.ops.last_executed_query(self.cursor, sql, params)
-        finally:
-            self.db._djdt_logger = self.logger
-
     def _record(self, method, sql, params):
         alias = self.db.alias
         vendor = self.db.vendor
@@ -191,7 +178,7 @@ class NormalCursorMixin(DjDTCursorWrapperMixin):
             kwargs = {
                 "vendor": vendor,
                 "alias": alias,
-                "sql": self._last_executed_query(sql, params),
+                "sql": self.last_executed_query(sql, params),
                 "duration": duration,
                 "raw_sql": sql,
                 "params": _params,
