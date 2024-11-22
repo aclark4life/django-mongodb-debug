@@ -319,19 +319,6 @@ class MongoPanel(Panel):
                     query
                 )
 
-                trans_id = query.get("trans_id")
-                prev_query = last_by_alias.get(alias, {})
-                prev_trans_id = prev_query.get("trans_id")
-
-                # annotate the queries as appropriate.
-                if trans_id != prev_trans_id:
-                    if prev_trans_id is not None:
-                        prev_query["ends_trans"] = True
-                    if trans_id is not None:
-                        query["starts_trans"] = True
-                if trans_id is not None:
-                    query["in_trans"] = True
-
                 query["form"] = SignedDataForm(
                     auto_id=None, initial=SQLSelectForm(initial=copy(query)).initial
                 )
